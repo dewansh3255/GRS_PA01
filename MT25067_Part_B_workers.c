@@ -1,7 +1,6 @@
 /*
  * Part B: Worker Functions
- * Implements CPU, Memory, and I/O intensive tasks.
- * Modular and well-commented as per.
+ * calibrated for measurable execution time ~5-15 seconds
  */
 
 #include "MT25067_Part_B_workers.h"
@@ -12,49 +11,50 @@
 #include <unistd.h>
 
 long get_iterations() {
-    return ROLL_LAST_DIGIT * BASE_ITERATIONS;
+    return ROLL_LAST_DIGIT * BASE_ITERATIONS; // Returns 7000
 }
 
-// 1. Function "cpu": CPU-intensive [cite: 19]
-// Performs complex calculations (e.g., matrix multiplication or trig functions)
+// 1. CPU: Needs MORE work to be visible
 void run_cpu_intensive() {
     long count = get_iterations();
     double result = 0.0;
-    for (long i = 0; i < count * 1000; i++) { // Added multiplier to make it measurable by 'top'
+    // Increased multiplier from 1000 to 100,000 to catch 'top' attention
+    for (long i = 0; i < count * 100000; i++) { 
         result += sin(i) * cos(i);
     }
-    // Prevent compiler optimization
     if (result == 12345.0) printf("Ignore\n"); 
 }
 
-// 2. Function "mem": Memory-intensive [cite: 22]
-// Moves large amounts of data to bottleneck RAM [cite: 23]
+// 2. MEM: Needs LESS work to avoid 17-minute runtime
 void run_mem_intensive() {
     long count = get_iterations();
-    // Allocate a large chunk (e.g., 50MB) to stress memory bandwidth
-    size_t size = 50 * 1024 * 1024; 
+    // Reduced buffer from 50MB to 1MB (1024*1024)
+    // 7000 * 1MB = 7GB total throughput (manageable in ~5-10s)
+    size_t size = 1 * 1024 * 1024; 
     char *buffer = (char *)malloc(size);
     if (!buffer) return;
 
     for (long i = 0; i < count; i++) {
-        // memset and memcpy force CPU-RAM interaction
         memset(buffer, i % 255, size);
+        // Volatile access to ensure it's not optimized away
+        volatile char c = buffer[i % size];
+        (void)c; 
     }
     free(buffer);
 }
 
-// 3. Function "io": I/O-intensive [cite: 26]
-// Spends time waiting for disk operations [cite: 28]
+// 3. IO: Needs LESS work to avoid disk thrashing
 void run_io_intensive() {
     long count = get_iterations();
     FILE *fp;
     const char *filename = "temp_io_test.txt";
-    char data[] = "Writing some data to disk to simulate I/O load.\n";
+    char data[] = "Writing data.\n";
 
     for (long i = 0; i < count; i++) {
         fp = fopen(filename, "w");
         if (fp) {
-            for(int j=0; j<100; j++) { // Write repeatedly
+            // Reduced writes per file open from 100 to 10
+            for(int j=0; j<10; j++) { 
                 fputs(data, fp);
             }
             fclose(fp);
@@ -67,5 +67,5 @@ void run_io_intensive() {
             fclose(fp);
         }
     }
-    remove(filename); // Clean up
+    remove(filename);
 }

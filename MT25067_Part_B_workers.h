@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 #define ROLL_LAST_DIGIT 7
-#define BASE_ITERATIONS 1000 
+#define BASE_ITERATIONS 1000
 
 // Worker function prototypes
 void run_cpu_intensive();
