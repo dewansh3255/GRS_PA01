@@ -40,6 +40,8 @@ for count in {2..5}; do
     avg_disk=$(grep -E "sda|vda|xvda" iostat_log.txt | awk '{sum+=$4; count++} END {if (count > 0) print sum/count; else print 0}')
 
     echo "Program_A,$TASK,$count,$duration,$avg_cpu,$avg_disk" >> $CSV_FILE
+
+    rm top_log.txt iostat_log.txt
     sleep 1
 done
 
@@ -64,6 +66,8 @@ for count in {2..8}; do
     avg_disk=$(grep -E "sda|vda|xvda" iostat_log.txt | awk '{sum+=$4; count++} END {if (count > 0) print sum/count; else print 0}')
 
     echo "Program_B,$TASK,$count,$duration,$avg_cpu,$avg_disk" >> $CSV_FILE
+
+    rm top_log.txt iostat_log.txt
     sleep 1
 done
 
