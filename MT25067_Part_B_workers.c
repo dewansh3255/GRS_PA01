@@ -9,6 +9,7 @@
 #include <string.h>
 #include <math.h>
 #include <unistd.h>
+#include <pthread.h>
 
 long get_iterations() {
     return ROLL_LAST_DIGIT * BASE_ITERATIONS; // Returns 7000
@@ -47,7 +48,9 @@ void run_mem_intensive() {
 void run_io_intensive() {
     long count = get_iterations();
     FILE *fp;
-    const char *filename = "temp_io_test.txt";
+    char filename[50];
+    snprintf(filename, sizeof(filename), "io_test_%lx.txt", (unsigned long)pthread_self());    
+    
     char data[] = "Writing data.\n";
 
     for (long i = 0; i < count; i++) {
@@ -59,6 +62,7 @@ void run_io_intensive() {
             }
             fclose(fp);
         }
+        
         // Read it back
         fp = fopen(filename, "r");
         if(fp) {
