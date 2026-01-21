@@ -15,22 +15,34 @@ long get_iterations() {
     return ROLL_LAST_DIGIT * BASE_ITERATIONS; // Returns 7000
 }
 
+// helper function
+double calculate_pi_leibniz(long terms) {
+    double pi = 0.0;
+    for (long i = 0; i < terms; i++) {
+        double term = 4.0 / (2 * i + 1);
+        if (i % 2 == 0) pi += term;
+        else pi -= term;
+    }
+    return pi;
+}
+
 // 1. CPU: Needs MORE work to be visible
 void run_cpu_intensive() {
-    long count = get_iterations();
-    double result = 0.0;
-    // Increased multiplier from 1000 to 100,000 to catch 'top' attention
-    for (long i = 0; i < count * 100000; i++) { 
-        result += sin(i) * cos(i);
+    long count = get_iterations(); // 7000
+    double dummy_result = 0.0;
+
+    for (long i = 0; i < count; i++) { 
+        // Perform a heavy calculation: Compute Pi to 3,000,000 terms precision
+        dummy_result += calculate_pi_leibniz(3000000);
     }
-    if (result == 12345.0) printf("Ignore\n"); 
+
+    // Prevent compiler optimization
+    if (dummy_result == 123.456) printf("Ignore\n");
 }
 
 // 2. MEM: Needs LESS work to avoid 17-minute runtime
 void run_mem_intensive() {
     long count = get_iterations();
-    // Reduced buffer from 50MB to 1MB (1024*1024)
-    // 7000 * 1MB = 7GB total throughput (manageable in ~5-10s)
     size_t size = 1 * 1024 * 1024; 
     char *buffer = (char *)malloc(size);
     if (!buffer) return;
@@ -62,7 +74,7 @@ void run_io_intensive() {
             }
             fclose(fp);
         }
-        
+
         // Read it back
         fp = fopen(filename, "r");
         if(fp) {
