@@ -49,7 +49,8 @@ for prog in "${PROGRAMS[@]}"; do
         avg_cpu=$(awk '{sum+=$9; count++} END {if (count > 0) print sum/count; else print 0}' top_log.txt)
 
         # Parse Disk: loop over iostat and look for the main disk (usually sda or vda in Docker)
-        avg_disk=$(grep -E "sda|vda|xvda" iostat_log.txt | awk '{sum+=$4; count++} END {if (count > 0) print sum/count; else print 0}')
+        # avg_disk=$(grep -E "sda|vda|xvda" iostat_log.txt | awk '{sum+=$4; count++} END {if (count > 0) print sum/count; else print 0}')
+        avg_disk=$(grep -E "sda|vda|xvda|nvme[0-9]n[0-9]" iostat_log.txt | awk '{sum+=$4; count++} END {if (count > 0) print sum/count; else print 0}')
 
         echo "Finished $prog + $task: Time=$duration, CPU=$avg_cpu, Disk=$avg_disk"
         
