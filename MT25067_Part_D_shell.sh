@@ -64,7 +64,8 @@ for count in {2..8}; do
 
     duration=$(echo "$end_time - $start_time" | bc)
     avg_cpu=$(awk '{sum+=$9; count++} END {if (count > 0) print sum/count; else print 0}' top_log.txt)
-    avg_disk=$(grep -E "sda|vda|xvda" iostat_log.txt | awk '{sum+=$4; count++} END {if (count > 0) print sum/count; else print 0}')
+    # avg_disk=$(grep -E "sda|vda|xvda" iostat_log.txt | awk '{sum+=$4; count++} END {if (count > 0) print sum/count; else print 0}')
+    avg_disk=$(grep -E "sda|vda|xvda|nvme[0-9]n[0-9]" iostat_log.txt | awk '{sum+=$4; count++} END {if (count > 0) print sum/count; else print 0}')
 
     echo "Program_B,$TASK,$count,$duration,$avg_cpu,$avg_disk" >> $CSV_FILE
 
